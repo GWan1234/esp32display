@@ -1,75 +1,110 @@
+<div align="center">
+
 # ESP32Display
 
-**ESP32Display** is a DIY **ESP32 + Waveshare e-paper display** project for showing weather information and office smart-home data from **Home Assistant**.
+**A DIY ESP32 + Waveshare e-paper dashboard for Home Assistant office and weather data.**
 
-The project uses an ESP32-WROOM-32 development board, a Waveshare 4.2-inch 400×300 e-paper display, ESPHome, and Home Assistant sensors to create a low-power dashboard for an office environment.
+![ESP32](https://img.shields.io/badge/ESP32-WROOM--32-2C3E50?style=for-the-badge&logo=espressif&logoColor=white)
+![ESPHome](https://img.shields.io/badge/ESPHome-e--paper-03A9F4?style=for-the-badge)
+![Home Assistant](https://img.shields.io/badge/Home%20Assistant-smart%20home-41BDF5?style=for-the-badge&logo=homeassistant&logoColor=white)
+![Waveshare](https://img.shields.io/badge/Waveshare-4.2%22%20400%C3%97300-111111?style=for-the-badge)
 
-This build was mostly inspired by the excellent projects shared in the Home Assistant community thread below:
+</div>
 
-[Home Assistant Community — E-paper display thread](https://community.home-assistant.io/t/e-paper-display/)
+<p align="center">
+  <img src="images/IMG_0309.JPG" width="78%" alt="ESP32Display finished e-paper dashboard on a desk" />
+</p>
+
+**ESP32Display** is a low-power, always-visible office dashboard built with an **ESP32-WROOM-32**, a **Waveshare 4.2-inch 400×300 e-paper display**, **ESPHome**, and **Home Assistant** sensors.
+
+It was mostly inspired by the excellent e-paper display projects shared in the Home Assistant community:
+
+<p align="center">
+  <a href="https://community.home-assistant.io/t/e-paper-display/">Home Assistant Community — E-paper display thread</a>
+</p>
 
 ---
 
-## Project photos
+## At a glance
 
-<p float="left">
-  <img src="images/IMG_0275.JPG" width="45%" alt="ESP32Display project photo 1" />
-  <img src="images/IMG_0276.JPG" width="45%" alt="ESP32Display project photo 2" />
+- **Display:** Waveshare 4.2-inch raw e-paper panel, 400×300 resolution
+- **Controller:** ESP32-WROOM-32 Lua development board
+- **Firmware:** ESPHome with custom display rendering in YAML/C++ lambdas
+- **Data source:** Home Assistant sensors, binary sensors, weather entities, and template sensors
+- **Use case:** Office weather, environment, motion/door/window, power, uptime, and network status display
+- **Case:** 3D printed enclosure based on [Thingiverse model 4772071](https://www.thingiverse.com/thing:4772071)
+
+---
+
+## Gallery
+
+### Finished dashboard and build photos
+
+<p align="center">
+  <img src="images/IMG_0275.JPG" width="32%" alt="ESP32Display build photo 1" />
+  <img src="images/IMG_0276.JPG" width="32%" alt="ESP32Display build photo 2" />
+  <img src="images/IMG_0280.JPG" width="32%" alt="ESP32Display build photo 3" />
 </p>
 
-<p float="left">
-  <img src="images/IMG_0280.JPG" width="45%" alt="ESP32Display project photo 3" />
-  <img src="images/IMG_0304.JPG" width="45%" alt="ESP32Display project photo 4" />
-</p>
-
-<p float="left">
-  <img src="images/IMG_0305.JPG" width="45%" alt="ESP32Display project photo 5" />
-  <img src="images/IMG_0309.JPG" width="45%" alt="ESP32Display project photo 6" />
+<p align="center">
+  <img src="images/IMG_0304.JPG" width="32%" alt="ESP32Display assembly photo" />
+  <img src="images/IMG_0305.JPG" width="32%" alt="ESP32Display mounted in its case" />
+  <img src="images/IMG_0309.JPG" width="32%" alt="ESP32Display final dashboard view" />
 </p>
 
 ### Size comparison
 
-<p float="left">
-  <img src="images/IMG_0310.JPG" width="45%" alt="ESP32Display size comparison 1" />
-  <img src="images/IMG_0314.JPG" width="45%" alt="ESP32Display size comparison 2" />
-</p>
-
-<p float="left">
-  <img src="images/IMG_0316.JPG" width="45%" alt="ESP32Display size comparison 3" />
-  <img src="images/IMG_0317.JPG" width="45%" alt="ESP32Display size comparison 4" />
+<p align="center">
+  <img src="images/IMG_0310.JPG" width="24%" alt="ESP32Display size comparison 1" />
+  <img src="images/IMG_0314.JPG" width="24%" alt="ESP32Display size comparison 2" />
+  <img src="images/IMG_0316.JPG" width="24%" alt="ESP32Display size comparison 3" />
+  <img src="images/IMG_0317.JPG" width="24%" alt="ESP32Display size comparison 4" />
 </p>
 
 ---
 
-## What it shows
+## What the display shows
 
-The display is designed as an always-visible Home Assistant dashboard for office and weather data.
+The layout is rendered directly in ESPHome using the Waveshare e-paper display component, Google Sans fonts, and Material Design Icons.
 
-Depending on your Home Assistant entities and the ESPHome YAML version you use, it can show information such as:
+Depending on the YAML version and the Home Assistant entities available in your setup, the dashboard can show:
 
-- Current time and full date
-- Turkish day name
+- Current time, full date, and Turkish day name
 - Sunrise and sunset times
 - Moon phase icon
 - Current weather condition icon
-- Outside temperature, minimum/maximum forecast temperature, precipitation, wind speed, and pressure
-- 3-day weather forecast with icons and values
+- Outside temperature, forecast low/high, precipitation, wind speed, and pressure
+- 3-day forecast with day names, icons, temperature, wind, and precipitation values
 - Office, kitchen, and outside temperature/humidity values
 - Motion, door, and window sensor states with last-change times
 - Air freshener and printer/toner percentage values
 - Power consumption
 - ESP32 uptime
-- Download speed
-- Wi-Fi signal indicator
-- Optional mouse battery information in the newer YAML version
+- Download speed and Wi-Fi signal indicator
+- Optional mouse battery and door-lock information in the newer YAML version
 
-The layout is rendered directly in ESPHome using the Waveshare e-paper display component and custom fonts/icons.
+---
+
+## How it works
+
+```text
+Home Assistant sensors/templates
+        │
+        ▼
+ESPHome homeassistant sensors/text_sensors
+        │
+        ▼
+ESP32-WROOM-32
+        │  SPI + control pins
+        ▼
+Waveshare 4.2" e-paper display
+```
+
+The `configuration.yaml` file contains Home Assistant template sensors for date formatting, forecast values, sunrise/sunset, last-change times, and uptime formatting. The ESPHome YAML files consume those entities through `homeassistant` sensors and draw the screen using custom display lambda code.
 
 ---
 
 ## Hardware used
-
-The original build uses:
 
 - Waveshare 4.2-inch, 400×300 raw e-paper display
 - Waveshare Universal e-Paper Raw Panel Driver HAT
@@ -85,7 +120,7 @@ The original build uses:
 - [ESPHome](https://esphome.io/)
 - Waveshare e-paper display support in ESPHome
 - Home Assistant template sensors for date, forecast, uptime, and last-change information
-- Custom fonts and Material Design Icons included in the repository
+- Custom fonts and Material Design Icons included in this repository
 
 ---
 
@@ -118,10 +153,11 @@ The original build uses:
 ### Main files
 
 - `esp32display.yaml` — original ESPHome configuration for the ESP32 e-paper dashboard.
-- `esp32displaynewversion28112024.yaml` — newer ESPHome configuration version with updated entities and ESPHome OTA syntax.
+- `esp32displaynewversion28112024.yaml` — newer ESPHome configuration version dated 28.11.2024, with updated entities, newer OTA syntax, and additional mouse/lock information.
 - `configuration.yaml` — Home Assistant template sensors used by the display, including date, forecast, sunrise/sunset, motion times, and uptime formatting.
-- `fonts/` — font files used by the ESPHome display layout.
-- `images/` — build and size-comparison photos.
+- `fonts/` — Google Sans and Material Design Icons font files used by the display layout.
+- `images/` — build photos and size-comparison photos.
+- `secrets.yaml` — example secret placeholders for Wi-Fi and ESPHome passwords.
 
 ---
 
@@ -160,14 +196,15 @@ display:
     reset_pin: $gpio_reset_pin
     dc_pin: $gpio_dc_pin
     model: 4.20in
-    update_interval: 60s
 ```
+
+The original YAML refreshes every `60s`; the newer YAML refreshes every `30s`.
 
 ---
 
 ## Home Assistant integration
 
-Most data shown on the display comes from Home Assistant entities. The ESPHome YAML pulls those values using `homeassistant` sensors and text sensors.
+Most values shown on the display come from Home Assistant entities. The ESPHome YAML files pull those values using `homeassistant` sensors and text sensors.
 
 Examples include:
 
@@ -177,9 +214,10 @@ Examples include:
 - Printer/toner and air freshener percentage sensors
 - Speedtest/download sensor
 - Power consumption sensor
-- Sun, moon, and date/time template sensors
+- Sun, moon, date/time, and uptime template sensors
+- Optional mouse battery and smart-lock entities in the newer YAML version
 
-The included `configuration.yaml` contains the Home Assistant template sensors needed by the display, such as:
+The included `configuration.yaml` contains template sensors such as:
 
 - `sensor.turkishdayname`
 - `sensor.fulldate`
@@ -204,7 +242,7 @@ You will likely need to customize:
 - Weather entity
 - Temperature/humidity sensor entity IDs
 - Motion, door, and window entity IDs
-- Printer, air freshener, power, speedtest, and other optional sensor entity IDs
+- Printer, air freshener, power, speedtest, mouse, lock, and other optional sensor entity IDs
 - Display labels if you want to use different room names or another language
 - Font paths if your ESPHome directory layout is different
 
@@ -220,14 +258,12 @@ Make sure these files are available in your ESPHome project directory when compi
 
 ---
 
-## Notes about the YAML versions
+## YAML versions
 
 There are two ESPHome YAML files in this repository:
 
-- `esp32display.yaml` — the earlier/original configuration.
-- `esp32displaynewversion28112024.yaml` — a newer version dated 28.11.2024.
-
-The newer version keeps the same general dashboard concept but updates some Home Assistant entity references and includes the newer ESPHome OTA platform syntax.
+- `esp32display.yaml` — earlier/original configuration using the original weather/entity references and `60s` update interval.
+- `esp32displaynewversion28112024.yaml` — newer version dated 28.11.2024, with updated entity references, newer ESPHome OTA platform syntax, `30s` update interval, and additional mouse/door-lock display fields.
 
 ---
 
